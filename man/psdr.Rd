@@ -22,7 +22,7 @@ psdr(
 
 \item{y}{response variable, either can be continuous variable or (+1,-1) coded binary response vector.}
 
-\item{loss}{pre-specified loss functions belongs to "svm", "logit","l2svm","wsvm", and etc., and user-defined loss function object also can be used formed by inside double (or single) quotation mark. Default is 'svm'.}
+\item{loss}{pre-specified loss functions belongs to \code{"svm", "logit", "l2svm", "wsvm", "qr", "asls", "wlogit", "wl2svm", "lssvm", "wlssvm"}, and user-defined loss function object also can be used formed by inside double (or single) quotation mark. Default is 'svm'.}
 
 \item{h}{the number of slices and probabilities equally spaced in \eqn{(0,1)}. Default value is 10.}
 
@@ -34,7 +34,7 @@ psdr(
 
 \item{eta}{learning rate for the gradient descent algorithm. The default value is 0.1.}
 
-\item{mtype}{a margin type, which is either margin ("m") or residual ("r") (See, Table 1 in manuscript). Only need when user-defined loss is used. Default is "m".}
+\item{mtype}{a margin type, which is either margin ("m") or residual ("r") (See, Table 1 in the manuscript). Only need when user-defined loss is used. Default is "m".}
 
 \item{plot}{If \code{TRUE} then it produces scatter plots of \eqn{Y} versus \eqn{\hat{B^{\top}}_{j}\mathbf{X}}. \eqn{j} can be specified by the user with \eqn{j=1} as a default. The default is FALSE.}
 }

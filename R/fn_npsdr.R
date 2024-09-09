@@ -3,7 +3,7 @@
 #'Principal Sufficient Dimension Reduction method
 #'@param x data matrix
 #'@param y either continuous or (+1,-1) typed binary response vector
-#'@param loss pre-specified loss functions are "svm", "logit","l2svm","wsvm", and etc., and user-defined loss function object also can be used formed by inside double (or single) quotation mark
+#'@param loss pre-specified loss functions belongs to \code{"svm", "logit", "l2svm", "wsvm", "qr", "asls", "wlogit", "wl2svm", "lssvm", "wlssvm"}, and user-defined loss function object also can be used formed by inside double (or single) quotation mark. Default is 'svm'.
 #'@param h the number of slices. default value is 10
 #'@param lambda hyperparameter for the loss function. default value is 1
 #'@param b number of basis functions for a kernel trick, floor(length(y)/3) is default

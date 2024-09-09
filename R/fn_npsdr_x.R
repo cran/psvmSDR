@@ -46,7 +46,7 @@ npsdr_x <- function(object, newdata, d = 2){
 
   new.x <- matrix(newdata, n.new, p)
   new.x <- t((t(new.x) - m)/s)
-  Kern <- kernel.function(new.x, y = new.x, param.kernel = bw)
+  Kern <- kernel.function(new.x, y = x, param.kernel = bw)
   #Kern <- svmpath::radial.kernel(new.x, x, bw) # n * n.new
   Kern.c <- t(Kern - apply(Kern, 1, mean))
   f <- matrix(0, n.new,  k)

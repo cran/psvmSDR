@@ -14,13 +14,13 @@
 #'
 #' @param x input matrix, of dimension \code{nobs} x \code{nvars}; each row is an observation vector. Requirement: \code{nvars}>1; in other words, \code{x} should have 2 or more columns.
 #' @param y response variable, either can be continuous variable or (+1,-1) coded binary response vector.
-#' @param loss pre-specified loss functions belongs to "svm", "logit","l2svm","wsvm", and etc., and user-defined loss function object also can be used formed by inside double (or single) quotation mark. Default is 'svm'.
+#' @param loss pre-specified loss functions belongs to \code{"svm", "logit", "l2svm", "wsvm", "qr", "asls", "wlogit", "wl2svm", "lssvm", "wlssvm"}, and user-defined loss function object also can be used formed by inside double (or single) quotation mark. Default is 'svm'.
 #' @param h the number of slices and probabilities equally spaced in \eqn{(0,1)}. Default value is 10.
 #' @param lambda the cost parameter for the svm loss function. The default value is 1.
 #' @param eps the threshold for stopping iteration with respect to the magnitude of the change of the derivative. The default value is 1.0e-5.
 #' @param max.iter maximum iteration number for the optimization process. default value is 100.
 #' @param eta learning rate for the gradient descent algorithm. The default value is 0.1.
-#' @param mtype a margin type, which is either margin ("m") or residual ("r") (See, Table 1 in manuscript). Only need when user-defined loss is used. Default is "m".
+#' @param mtype a margin type, which is either margin ("m") or residual ("r") (See, Table 1 in the manuscript). Only need when user-defined loss is used. Default is "m".
 #' @param plot If \code{TRUE} then it produces scatter plots of \eqn{Y} versus \eqn{\hat{B^{\top}}_{j}\mathbf{X}}. \eqn{j} can be specified by the user with \eqn{j=1} as a default. The default is FALSE.
 #' @return An object with S3 class "psdr". Details are listed below.
 #' \item{\code{Mn}}{The estimated working matrix, which is obtained by the cumulative

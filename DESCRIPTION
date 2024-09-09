@@ -1,7 +1,7 @@
 Type: Package
 Package: psvmSDR
 Title: Unified Principal Sufficient Dimension Reduction Package
-Version: 1.0.1
+Version: 1.0.2
 Authors@R: c(person(given = "Jungmin",
                     family = "Shin",
                     role = c("aut", "cre"),
@@ -20,9 +20,9 @@ Imports: stats, graphics
 Suggests: testthat
 RoxygenNote: 7.2.3
 NeedsCompilation: no
-Packaged: 2024-08-26 15:04:39 UTC; shin
+Packaged: 2024-09-02 04:10:45 UTC; shin
 Author: Jungmin Shin [aut, cre],
   Seung Jun Shin [aut],
   Andreas Artemiou [aut]
 Repository: CRAN
-Date/Publication: 2024-08-30 10:20:03 UTC
+Date/Publication: 2024-09-09 12:10:04 UTC

@@ -23,7 +23,7 @@ npsdr(
 
 \item{y}{either continuous or (+1,-1) typed binary response vector}
 
-\item{loss}{pre-specified loss functions are "svm", "logit","l2svm","wsvm", and etc., and user-defined loss function object also can be used formed by inside double (or single) quotation mark}
+\item{loss}{pre-specified loss functions belongs to \code{"svm", "logit", "l2svm", "wsvm", "qr", "asls", "wlogit", "wl2svm", "lssvm", "wlssvm"}, and user-defined loss function object also can be used formed by inside double (or single) quotation mark. Default is 'svm'.}
 
 \item{h}{the number of slices. default value is 10}
 
