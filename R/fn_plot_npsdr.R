@@ -20,6 +20,8 @@
 #' @import stats graphics
 #' @export
 
+
+
 plot.npsdr <- function(x, ..., d=1, lowess=TRUE) {
   object <- obj <- x
   dim <- d
@@ -28,9 +30,10 @@ plot.npsdr <- function(x, ..., d=1, lowess=TRUE) {
   if (!inherits(obj, "npsdr"))
     stop("use only with \"npsdr\" objects")
   temp <- object$evectors
-  if(sum(unique(object$y)) != 0){
-    #obj_psdr <- object$x %*% temp
-    obj_npsdr <- phix(object$x, object)
+
+  if(sum(unique(object$y)) != 0){ # Continuous response
+    obj_npsdr <- phix(object$x, object) # object$x is the original unscaled data
+
     if(d <= 2){
       par(mfrow=c(1,dim))
     }else{
@@ -46,9 +49,8 @@ plot.npsdr <- function(x, ..., d=1, lowess=TRUE) {
         grid(nx = NULL, ny = NULL, lty = 1, col = "gray", lwd = 1)
       }
     }
-    #par(mfrow=c(1,1))
-  }else{
-    x.nlsvm <- phix(object$x, object)
+  }else{ # Binary response
+    x.nlsvm <- phix(object$x, object) # object$x is the original unscaled data
     par(mar=c(5,5,5,5), oma=c(1,1,1,1))
     graphics::plot(x.nlsvm[,1], x.nlsvm[,2], type = "n", xlab = paste("Sufficient predictor ",1),
                    ylab = paste("Sufficient predictor ",2), ...)

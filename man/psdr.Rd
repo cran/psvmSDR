@@ -73,9 +73,9 @@ obj <- psdr(x, y)
 print(obj)
 plot(obj, d=2)
 
-## ----------------------------
-## Kernel PM
-## ----------------------------
+## --------------------------------
+## Linear PM (Binary classification)
+## --------------------------------
 obj_wsvm <- psdr(x, y.tilde, loss="wsvm")
 plot(obj_wsvm)
 

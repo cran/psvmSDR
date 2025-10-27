@@ -94,6 +94,7 @@ npsdr <- function(x, y, loss="svm", h=10, lambda=1, b=floor(length(y)/3),
   n <- nrow(Psi.new)
   p <- ncol(Psi.new)
   H <- h
+  set.seed(1)
   init.theta <- rnorm(sd=1,n=p)
   step <- 1/H
   pi.grid <- seq(step, 1-step, by = step)
@@ -119,8 +120,8 @@ npsdr <- function(x, y, loss="svm", h=10, lambda=1, b=floor(length(y)/3),
         y.tilde.new <- rep(1, nrow(Psi.new))
         y.tilde.new[y < qy[s]] <- -1  #s
         for(iter in 1:max.iter){
-            Psi <- Psi.new
-            y.tilde <- y.tilde.new
+          Psi <- Psi.new
+          y.tilde <- y.tilde.new
           n <- nrow(Psi)
           w <- w.init
           A <- t(Psi)%*%Psi
@@ -148,8 +149,8 @@ npsdr <- function(x, y, loss="svm", h=10, lambda=1, b=floor(length(y)/3),
         y.tilde.new <- rep(1, nrow(Psi.new))
         y.tilde.new[y < qy[s]] <- -1  #s
         for(iter in 1:max.iter){
-            Psi <- Psi.new
-            y.tilde <- y.tilde.new
+          Psi <- Psi.new
+          y.tilde <- y.tilde.new
           n <- nrow(Psi)
           w <- w.init
           A <- t(Psi)%*%Psi
@@ -173,8 +174,8 @@ npsdr <- function(x, y, loss="svm", h=10, lambda=1, b=floor(length(y)/3),
       y.new <- y
       for (s in 1:length(qprob)) {
         for(iter in 1:max.iter){
-            Psi <- Psi.new
-            y.bi <- y.new
+          Psi <- Psi.new
+          y.bi <- y.new
           n <- nrow(Psi)
           w <- w.init
           A <- t(Psi)%*%Psi
@@ -202,8 +203,8 @@ npsdr <- function(x, y, loss="svm", h=10, lambda=1, b=floor(length(y)/3),
         y.tilde.new <- rep(1, nrow(Psi.new))
         y.tilde.new[y < qy[s]] <- -1  #s
         for(iter in 1:max.iter){
-            Psi <- Psi.new
-            y.tilde <- y.tilde.new
+          Psi <- Psi.new
+          y.tilde <- y.tilde.new
           n <- nrow(Psi)
           w <- w.init
           A <- t(Psi)%*%Psi
@@ -229,8 +230,8 @@ npsdr <- function(x, y, loss="svm", h=10, lambda=1, b=floor(length(y)/3),
       y.new <- y
       for (s in 1:length(qprob)){
         for(iter in 1:max.iter){
-            Psi <- Psi.new
-            y.bi <- y.new
+          Psi <- Psi.new
+          y.bi <- y.new
           n <- nrow(Psi)
           w <- w.init
           A <- t(Psi)%*%Psi
@@ -256,8 +257,8 @@ npsdr <- function(x, y, loss="svm", h=10, lambda=1, b=floor(length(y)/3),
       y.new <- y
       for (s in 1:length(qprob)) {
         for(iter in 1:max.iter){
-            Psi <- Psi.new
-            y.bi <- y.new
+          Psi <- Psi.new
+          y.bi <- y.new
           n <- nrow(Psi)
           w <- w.init
           A <- t(Psi)%*%Psi
@@ -283,8 +284,8 @@ npsdr <- function(x, y, loss="svm", h=10, lambda=1, b=floor(length(y)/3),
         stop("response variable should be continuous!")
       for (s in 1:length(pi.grid)) {
         for(iter in 1:max.iter){
-            Psi <- Psi.new
-            y.new <- y
+          Psi <- Psi.new
+          y.new <- y
           n <- nrow(Psi)
           w <- w.init
           A <- t(Psi)%*%Psi
@@ -362,8 +363,8 @@ npsdr <- function(x, y, loss="svm", h=10, lambda=1, b=floor(length(y)/3),
         y.tilde.new[y < qy[s]] <- -1  #s
         w <- w.init
         for(iter in 1:max.iter){
-            Psi <- Psi.new
-            y.tilde <- y.tilde.new
+          Psi <- Psi.new
+          y.tilde <- y.tilde.new
           n <- nrow(Psi)
           derivative.vec <- rep(0,p)
           for (k in 1:p){
@@ -374,7 +375,7 @@ npsdr <- function(x, y, loss="svm", h=10, lambda=1, b=floor(length(y)/3),
           }
           w[,s] <- theta.new   #s
           if(max(abs(derivative.vec)) < eps)
-          break
+            break
         }
         w.init <- matrix(theta.new, nrow=p, ncol = length(qprob))
         w.final[,s] <- w[,s] ##s,s
@@ -387,8 +388,8 @@ npsdr <- function(x, y, loss="svm", h=10, lambda=1, b=floor(length(y)/3),
       for(s in 1:length(qprob)){
         w <- w.init
         for(iter in 1:max.iter){
-            Psi <- Psi.new
-            y.bi <- y.new
+          Psi <- Psi.new
+          y.bi <- y.new
           n <- nrow(Psi)
           derivative.vec <- rep(0,p)
           for (k in 1:p){
@@ -398,7 +399,7 @@ npsdr <- function(x, y, loss="svm", h=10, lambda=1, b=floor(length(y)/3),
           }
           w[,s] <- theta.new
           if(mean(abs(derivative.vec)) < eps)
-          break
+            break
         }
         w.init <- matrix(theta.new, nrow=p, ncol = length(qprob))
         w.final[,s] <- w[,s]
@@ -496,38 +497,83 @@ get.psi <- function(x, y, b=floor(length(y)/3)) {
 }
 
 
+#' #'@noRd
+#' phix <- function(value, object) {
+#'   psi.function <- psi.function
+#'   x <- value
+#'   v <- object$evector
+#'   w <- object$obj.psi$w
+#'   l <- object$obj.psi$l
+#'   d <- p <- dim(x)[2]
+#'   kernel.function <- kernel.function(x, y=x, param.kernel = 1/p)
+#'   tau <- mean(as.numeric(dist(x)))
+#'   kernel.param <- 1/tau^2
+#'   p <- ncol(x)
+#'   if (length(value) == p) {
+#'     temp <- psi.function(value, x, v[,1:d, drop = F], w, l, kernel.function, kernel.param)
+#'   } else if (ncol(value) == p) {
+#'     temp <- t(apply(value, 1, psi.function, x, v[,1:d, drop = F], w, l, kernel.function, kernel.param))
+#'   } else if (nrow(value) == p) {
+#'     temp <- t(apply(value, 2, psi.function, x, v[,1:d, drop = F], w, l, kernel.function, kernel.param))
+#'   } else stop("check `str(value)`")
+#'   temp
+#' }
+
 #'@noRd
 phix <- function(value, object) {
-  psi.function <- psi.function
-  x <- value
-  v <- object$evector
+  # Original scaled data from the object
+  original_scaled_x <- object$obj.psi$scaled.x
+  original_bw <- object$obj.psi$bw # Use the bw from the original object
+
+  v <- object$evectors
   w <- object$obj.psi$w
   l <- object$obj.psi$l
-  d <- p <- dim(x)[2]
-  kernel.function <- kernel.function(x, y=x, param.kernel = 1/p)
-  tau <- mean(as.numeric(dist(x)))
-  kernel.param <- 1/tau^2
-  p <- ncol(x)
-  if (length(value) == p) {
-    temp <- psi.function(value, x, v[,1:d, drop = F], w, l, kernel.function, kernel.param)
-  } else if (ncol(value) == p) {
-    temp <- t(apply(value, 1, psi.function, x, v[,1:d, drop = F], w, l, kernel.function, kernel.param))
-  } else if (nrow(value) == p) {
-    temp <- t(apply(value, 2, psi.function, x, v[,1:d, drop = F], w, l, kernel.function, kernel.param))
-  } else stop("check `str(value)`")
+  d <- ncol(v) # Use the dimension from the eigenvectors
+  p <- ncol(original_scaled_x) # Use the original data's dimension
+
+  # Scale the 'value' (which could be original x or new.x) using the original scaling parameters
+  m <- attr(original_scaled_x, "scaled:center")
+  s <- attr(original_scaled_x, "scaled:scale")
+  scaled_value <- t((t(value) - m)/s) # Ensure 'value' is scaled consistently
+
+  # Apply psi.function for each row of scaled_value
+  if (is.vector(scaled_value)) { # Handle single observation case
+    temp <- psi.function(scaled_value, original_scaled_x, v[,1:d, drop = F], w, l, original_bw)
+  } else if (is.matrix(scaled_value) || is.data.frame(scaled_value)) {
+    temp <- t(apply(scaled_value, 1, psi.function, original_scaled_x, v[,1:d, drop = F], w, l, original_bw))
+  } else {
+    stop("check `str(value)`")
+  }
   temp
 }
 
 
+
+
+#' #'@noRd
+#' psi.function <- function(value, x, v, w, l, kernel.function, kernel.param){
+#'   value <- matrix(value, 1, length(value))
+#'   temp <- kernel.function(value, x, kernel.param)
+#'   psi.value <- apply(w * c(temp - mean(temp)), 2, sum)/l
+#'   rslt <- psi.value %*% v
+#'   class(rslt) <- "npsdr"
+#'   return(rslt)
+#' }
+
 #'@noRd
-psi.function <- function(value, x, v, w, l, kernel.function, kernel.param){
-  value <- matrix(value, 1, length(value))
-  temp <- kernel.function(value, x, kernel.param)
-  psi.value <- apply(w * c(temp - mean(temp)), 2, sum)/l
-  rslt <- psi.value %*% v
-  class(rslt) <- "npsdr"
+psi.function <- function(value_scaled, original_scaled_x, v, w, l, kernel_param){
+  # value_scaled is already a scaled single row vector
+  value_scaled <- matrix(value_scaled, 1, length(value_scaled)) # Ensure it's a row matrix
+
+  # Use the global kernel.function
+  temp_kernel <- kernel.function(value_scaled, original_scaled_x, kernel_param)
+  temp_kernel_centered <- c(temp_kernel - mean(temp_kernel)) # vector of length n
+  psi_value <- colSums(w * temp_kernel_centered) / l
+
+  rslt <- psi_value %*% v # v is p x d, psi_value is 1 x p (after colSums)
   return(rslt)
 }
+
 
 
 #'@noRd

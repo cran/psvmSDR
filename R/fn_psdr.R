@@ -66,9 +66,9 @@
 #' print(obj)
 #' plot(obj, d=2)
 #'
-#'## ----------------------------
-#'## Kernel PM
-#'## ----------------------------
+#'## --------------------------------
+#'## Linear PM (Binary classification)
+#'## --------------------------------
 #' obj_wsvm <- psdr(x, y.tilde, loss="wsvm")
 #' plot(obj_wsvm)
 #'
@@ -114,8 +114,7 @@ psdr <- function(x, y, loss="svm", h=10, lambda=1, eps=1.0e-5, max.iter=100, eta
   p <- ncol(x)
   H <- h
 
-  init <- init.theta <- rnorm(dim(x)[2],0,1)
-
+  init <- init.theta <- rep(1, length=dim(x)[2])
   bar.x <- apply(x, 2, mean)
   x.star <- cbind(t(t(x)-bar.x), -1)
   cov.x.star <- cov(x.star)

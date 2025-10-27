@@ -18,7 +18,7 @@
 #' @name psvmSDR-package
 #' @docType package
 #' @author Jungmin Shin, Seung Jun Shin, Andreas Artemiou \cr Maintainer:
-#' Jungmin Shin \email{jungminshin@korea.ac.kr}
+#' Jungmin Shin \email{c16267@gmail.com}
 #' @references Artemiou, A. and Dong, Y. (2016)
 #' \emph{Sufficient dimension reduction via principal lq support vector machine,
 #'  Electronic Journal of Statistics 10: 783–805}.\cr
