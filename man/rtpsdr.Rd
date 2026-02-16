@@ -13,76 +13,81 @@ rtpsdr(x, y, obj = NULL, h = 10, lambda = 1)
 
 \item{obj}{the latest output object from the \code{rtpsdr}}
 
-\item{h}{a number of slices. default is set to 10.}
+\item{h}{unified control for slicing or weighting; accepts either an integer or a numeric vector.}
 
 \item{lambda}{hyperparameter for the loss function. default is set to 1.}
 }
 \value{
-An object with S3 class "rtpsdr". Details are listed below.
-\item{\code{x}}{input data matrix}
-\item{\code{y}}{iniput response vector}
-\item{\code{Mn}}{The estimated working matrix, which is obtained by the cumulative
-outer product of the estimated parameters over H}
-\item{\code{evalues}}{Eigenvalues of the Mn}
-\item{\code{evectors}}{Eigenvectors of the Mn, the first d leading eigenvectors consists
-the basis of the central subspace}
-\item{\code{N}}{total number of observation \eqn{n_1 + n_2}}
-\item{\code{Xbar}}{mean of total \eqn{\mathbf{x}}}
-\item{\code{r}}{updated estimated coefficients matrix}
-\item{\code{A}}{new A part for update. See Artemiou et. al., (2021)}
+An object of class \code{c("rtpsdr","psdr")} containing:
+\itemize{
+\item \code{x}, \code{y}: latest batch data
+\item \code{M}: working matrix
+\item \code{evalues}, \code{evectors}: eigen-decomposition of \code{M} (central subspace basis)
+\item \code{N}: cumulative sample size
+\item \code{Xbar}: cumulative mean vector
+\item \code{r}: slice-specific coefficient matrix
+\item \code{A}: new A part for update. See Artemiou et. al., (2021)
+\item \code{loss}: "lssvm" (continuous) or "wlssvm" (binary)
+\item \code{fit}: metadata (mode="realtime", H, cutpoints, weight_cutpoints, lambda, etc.)
+}
 }
 \description{
-In stream data, where we need to constantly update the estimation as new data are collected,
-the use of all available data can create computational challenges even for computationally efficient algorithms.
-Therefore it is important to develop real time SDR algorithms that work efficiently in the case that there are data streams.
-After getting an initial estimator with the currently available data,
-the basic idea of real-time method is to update the estimator efficiently as new data are collected.
-This function realizes real time least squares SVM SDR method for a both regression and classification problem
-It is efficient algorithms for either adding new data or removing old data are provided.
+This function implements a real-time version of principal SDR based on
+least squares SVM loss. It is intended for streaming or sequential data
+settings where new observations arrive continuously and re-fitting the full
+SDR model would be computationally expensive.
+
+After an initial psdr or rtpsdr fit is obtained, this function updates the
+working matrix M, slice statistics, and eigen-decomposition efficiently
+using only the new batch of data. The method supports both regression and
+binary classification, automatically choosing the appropriate LS-SVM variant.
+
+The returned object includes cumulative sample size, updated mean vector,
+slice coefficients, intermediate matrices required for updates, and the
+resulting central subspace basis.
 }
 \examples{
 \donttest{
-p <- 5
-m <- 500 # batch size
-N <- 10  # number of batches
+set.seed(1)
+p <- 5; m <- 300; B <- 3
 obj <- NULL
-for (iter in 1:N){
- set.seed(iter)
- x <- matrix(rnorm(m*p), m, p)
- y <-  x[,1]/(0.5 + (x[,2] + 1)^2) + 0.2 * rnorm(m)
- obj <- rtpsdr(x = x, y = y, obj=obj)
+for (b in 1:B) {
+  x <- matrix(rnorm(m*p), m, p)
+  y <- x[,1]/(0.5+(x[,2]+1)^2) + 0.2*rnorm(m)
+  obj <- rtpsdr(x, y, obj=obj, h=8, lambda=1)
 }
 print(obj)
+summary(obj)
 }
 }
 \references{
 Artemiou, A. and Dong, Y. (2016)
 \emph{Sufficient dimension reduction via principal lq support vector machine,
- Electronic Journal of Statistics 10: 783–805}.\cr
- Artemiou, A., Dong, Y. and Shin, S. J. (2021)
+Electronic Journal of Statistics 10: 783–805}.\cr
+Artemiou, A., Dong, Y. and Shin, S. J. (2021)
 \emph{Real-time sufficient dimension reduction through principal least
- squares support vector machines, Pattern Recognition 112: 107768}.\cr
- Kim, B. and Shin, S. J. (2019)
+squares support vector machines, Pattern Recognition 112: 107768}.\cr
+Kim, B. and Shin, S. J. (2019)
 \emph{Principal weighted logistic regression for sufficient dimension
 reduction in binary classification, Journal of the Korean Statistical Society 48(2): 194–206}.\cr
- Li, B., Artemiou, A. and Li, L. (2011)
+Li, B., Artemiou, A. and Li, L. (2011)
 \emph{Principal support vector machines for linear and
 nonlinear sufficient dimension reduction, Annals of Statistics 39(6): 3182–3210}.\cr
 Soale, A.-N. and Dong, Y. (2022)
 \emph{On sufficient dimension reduction via principal asymmetric
- least squares, Journal of Nonparametric Statistics 34(1): 77–94}.\cr
- Wang, C., Shin, S. J. and Wu, Y. (2018)
+least squares, Journal of Nonparametric Statistics 34(1): 77–94}.\cr
+Wang, C., Shin, S. J. and Wu, Y. (2018)
 \emph{Principal quantile regression for sufficient dimension
- reduction with heteroscedasticity, Electronic Journal of Statistics 12(2): 2114–2140}.\cr
- Shin, S. J., Wu, Y., Zhang, H. H. and Liu, Y. (2017)
+reduction with heteroscedasticity, Electronic Journal of Statistics 12(2): 2114–2140}.\cr
+Shin, S. J., Wu, Y., Zhang, H. H. and Liu, Y. (2017)
 \emph{Principal weighted support vector machines for sufficient dimension reduction in
- binary classification, Biometrika 104(1): 67–81}. \cr
- Li, L. (2007)
+binary classification, Biometrika 104(1): 67–81}. \cr
+Li, L. (2007)
 \emph{Sparse sufficient dimension reduction, Biometrika 94(3): 603–613}.
 }
 \seealso{
 \code{\link{psdr}}, \code{\link{npsdr}}
 }
 \author{
-Jungmin Shin, \email{jungminshin@korea.ac.kr}, Seung Jun Shin, \email{sjshin@korea.ac.kr}, Andreas Artemiou \email{artemiou@uol.ac.cy}
+Jungmin Shin, \email{c16267@gmail.com}, Seung Jun Shin, \email{sjshin@korea.ac.kr}, Andreas Artemiou \email{artemiou@uol.ac.cy}
 }

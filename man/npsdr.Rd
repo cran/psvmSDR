@@ -14,7 +14,7 @@ npsdr(
   eps = 1e-05,
   max.iter = 100,
   eta = 0.1,
-  mtype,
+  mtype = "m",
   plot = TRUE
 )
 }
@@ -25,7 +25,7 @@ npsdr(
 
 \item{loss}{pre-specified loss functions belongs to \code{"svm", "logit", "l2svm", "wsvm", "qr", "asls", "wlogit", "wl2svm", "lssvm", "wlssvm"}, and user-defined loss function object also can be used formed by inside double (or single) quotation mark. Default is 'svm'.}
 
-\item{h}{the number of slices. default value is 10}
+\item{h}{unified control for slicing or weighting; accepts either an integer or a numeric vector.}
 
 \item{lambda}{hyperparameter for the loss function. default value is 1}
 
@@ -42,13 +42,28 @@ npsdr(
 \item{plot}{If \code{TRUE} then it produces scatter plots of \eqn{Y} versus the first sufficient predictor. The default is FALSE.}
 }
 \value{
-An object with S3 class "npsdr". Details are listed below.
-\item{\code{evalues}}{Eigenvalues of the estimated working matrix M.}
-\item{\code{evectors}}{Eigenvectors of the estimated working matrix M, the first d leading eigenvectors consists
-the basis of the central subspace.}
+An object of class "npsdr" containing:
+\itemize{
+\item \code{x}, \code{y}: input data
+\item \code{M}: working matrix
+\item \code{evalues}, \code{evectors}: eigen-decomposition of M
+\item \code{obj.psi}: kernel basis object from \code{get.psi()}
+\item \code{fit}: metadata (loss, h, lambda, eps, max.iter, eta, b, response.type, cutpoints, weight_cutpoints)
+}
 }
 \description{
-Principal Sufficient Dimension Reduction method
+This function extends principal SDR to nonlinear relationships between
+predictors and the response using a kernel feature map. The kernel basis
+is constructed internally using a data-driven number of basis functions,
+and the working matrix is formed analogously to linear principal SDR but
+in the transformed feature space.
+
+Users may choose from built-in loss functions or provide a custom loss
+through the same interface as psdr(). The method supports both continuous
+and binary responses and can visualize the nonlinear sufficient predictors.
+
+The output contains the kernel basis object, the working matrix M,
+eigenvalues and eigenvectors, and detailed fitting metadata.
 }
 \examples{
 \donttest{
@@ -59,37 +74,39 @@ x <- matrix(rnorm(n*p, 0, 2), n, p)
 y <- 0.5*sqrt((x[,1]^2+x[,2]^2))*(log(x[,1]^2+x[,2]^2))+ 0.2*rnorm(n)
 obj_kernel <- npsdr(x, y, plot=FALSE)
 print(obj_kernel)
+summary(obj_kernel)
 plot(obj_kernel)
+
 }
 }
 \references{
 Artemiou, A. and Dong, Y. (2016)
 \emph{Sufficient dimension reduction via principal lq support vector machine,
- Electronic Journal of Statistics 10: 783–805}.\cr
- Artemiou, A., Dong, Y. and Shin, S. J. (2021)
+Electronic Journal of Statistics 10: 783–805}.\cr
+Artemiou, A., Dong, Y. and Shin, S. J. (2021)
 \emph{Real-time sufficient dimension reduction through principal least
- squares support vector machines, Pattern Recognition 112: 107768}.\cr
- Kim, B. and Shin, S. J. (2019)
+squares support vector machines, Pattern Recognition 112: 107768}.\cr
+Kim, B. and Shin, S. J. (2019)
 \emph{Principal weighted logistic regression for sufficient dimension
 reduction in binary classification, Journal of the Korean Statistical Society 48(2): 194–206}.\cr
- Li, B., Artemiou, A. and Li, L. (2011)
+Li, B., Artemiou, A. and Li, L. (2011)
 \emph{Principal support vector machines for linear and
 nonlinear sufficient dimension reduction, Annals of Statistics 39(6): 3182–3210}.\cr
 Soale, A.-N. and Dong, Y. (2022)
 \emph{On sufficient dimension reduction via principal asymmetric
- least squares, Journal of Nonparametric Statistics 34(1): 77–94}.\cr
- Wang, C., Shin, S. J. and Wu, Y. (2018)
+least squares, Journal of Nonparametric Statistics 34(1): 77–94}.\cr
+Wang, C., Shin, S. J. and Wu, Y. (2018)
 \emph{Principal quantile regression for sufficient dimension
- reduction with heteroscedasticity, Electronic Journal of Statistics 12(2): 2114–2140}.\cr
- Shin, S. J., Wu, Y., Zhang, H. H. and Liu, Y. (2017)
+reduction with heteroscedasticity, Electronic Journal of Statistics 12(2): 2114–2140}.\cr
+Shin, S. J., Wu, Y., Zhang, H. H. and Liu, Y. (2017)
 \emph{Principal weighted support vector machines for sufficient dimension reduction in
- binary classification, Biometrika 104(1): 67–81}. \cr
- Li, L. (2007)
+binary classification, Biometrika 104(1): 67–81}. \cr
+Li, L. (2007)
 \emph{Sparse sufficient dimension reduction, Biometrika 94(3): 603–613}.
 }
 \seealso{
 \code{\link{npsdr_x}}, \code{\link{psdr}}, \code{\link{rtpsdr}}
 }
 \author{
-Jungmin Shin, \email{jungminshin@korea.ac.kr}, Seung Jun Shin, \email{sjshin@korea.ac.kr}, Andreas Artemiou \email{artemiou@uol.ac.cy}
+Jungmin Shin, \email{c16267@gmail.com}, Seung Jun Shin, \email{sjshin@korea.ac.kr}, Andreas Artemiou \email{artemiou@uol.ac.cy}
 }

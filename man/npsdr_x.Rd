@@ -2,7 +2,7 @@
 % Please edit documentation in R/fn_npsdr_x.R
 \name{npsdr_x}
 \alias{npsdr_x}
-\title{Reconstruct the estimated sufficient predictors for a given data matrix}
+\title{Reconstruct estimated sufficient predictors for new data}
 \usage{
 npsdr_x(object, newdata, d = 2)
 }
@@ -18,7 +18,26 @@ the value of the estimated nonlinear mapping \eqn{\phi(\cdot)} is applied to
 newdata \eqn{X} with dimension d is returned.
 }
 \description{
-Returning the estimated sufficient predictors \eqn{\hat{\phi}(\mathbf{x})} for a given \eqn{\mathbf{x}}
+Computes the nonlinear sufficient predictors \eqn{\hat{\phi}(\mathbf{x})} for a
+new data matrix using a previously fitted \code{npsdr} object.
+
+This function evaluates the learned kernel-based sufficient dimension
+reduction (SDR) mapping on new observations. Given a fitted nonlinear SDR
+model \eqn{\hat{\phi}} estimated from \code{npsdr()}, the function computes:
+
+\deqn{
+  \hat{Z} = \hat{\phi}(X_{\text{new}}) = \Psi(X_{\text{new}})^{\top}
+  \, \hat{V}_{1:d},
+}
+
+where \eqn{\Psi(\cdot)} is the kernel feature map constructed from the training
+data, and \eqn{\hat{V}_{1:d}} contains the first \eqn{d} eigenvectors of the
+estimated working matrix \eqn{M}. These eigenvectors span the estimated
+central subspace in the kernel-transformed space.
+
+This enables users to extract sufficient predictors for downstream tasks
+such as visualization, classification, regression, or clustering on new data,
+without re-estimating the SDR model.
 }
 \examples{
 \donttest{
@@ -30,12 +49,13 @@ x <- matrix(rnorm(n*p, 0, 2), n, p)
 y <- 0.5*sqrt((x[,1]^2+x[,2]^2))*(log(x[,1]^2+x[,2]^2))+ 0.2*rnorm(n)
 new.x <- matrix(rnorm(n.new*p, 0, 2), n.new, p)
 obj_kernel <- npsdr(x, y)
-npsdr_x(object=obj_kernel, newdata=new.x)
+z_new <- npsdr_x(object=obj_kernel, newdata=new.x)
+dim(z_new)
 }
 }
 \seealso{
 \code{\link{npsdr}}
 }
 \author{
-Jungmin Shin, \email{jungminshin@korea.ac.kr}, Seung Jun Shin, \email{sjshin@korea.ac.kr}, Andreas Artemiou \email{artemiou@uol.ac.cy}
+Jungmin Shin, \email{c16267@gmail.com}, Seung Jun Shin, \email{sjshin@korea.ac.kr}, Andreas Artemiou \email{artemiou@uol.ac.cy}
 }

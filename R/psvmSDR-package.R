@@ -9,7 +9,7 @@
 #' The package implements the well-known gradient descent algorithm for the PMs to efficiently compute the SDR estimators in various situations.
 #'
 #' \tabular{ll}{ Package: \tab psvmSDR\cr Type: \tab Package\cr Version: \tab
-#' 1.0.0\cr Date: \tab 2024-05-01\cr License: \tab GPL-2 \cr }
+#' 2.0.1\cr Date: \tab 2024-05-01\cr License: \tab GPL-2 \cr }
 #' Very simple to use. Accepts \code{x,y} data for regression (or classification) models, and
 #' produces the basis of the central subspace, which has a lower rank to the original data matrix.
 #' The main 3 functions are: \code{psdr} for a linear principal machines (PM), \cr

@@ -2,24 +2,53 @@
 % Please edit documentation in R/fn_plot_npsdr.R
 \name{plot.npsdr}
 \alias{plot.npsdr}
-\title{Scatter plot with sufficient predictors from npsdr() function}
+\title{Plot sufficient predictors from an npsdr object}
 \usage{
-\method{plot}{npsdr}(x, ..., d = 1, lowess = TRUE)
+\method{plot}{npsdr}(
+  x,
+  ...,
+  d = 1,
+  lowess = TRUE,
+  col = NULL,
+  line.col = "red",
+  pch = 16,
+  lwd = 1.2,
+  xlab = NULL,
+  ylab = NULL
+)
 }
 \arguments{
-\item{x}{object from the function \code{npsdr()}}
+\item{x}{object from \code{npsdr()}}
 
-\item{...}{Additional arguments to be passed to generic \code{plot} function.}
+\item{...}{additional graphical parameters for \code{plot()}}
 
-\item{d}{number of sufficient predictors. Default is 1.}
+\item{d}{number of sufficient predictors to plot (default = 1)}
 
-\item{lowess}{draw a lowess curve. Default is TRUE.}
+\item{lowess}{draw a lowess curve for continuous responses (default = TRUE)}
+
+\item{col}{point color(s)}
+
+\item{line.col}{color for lowess smoothing line (default = "red")}
+
+\item{pch}{point character (default = 16)}
+
+\item{lwd}{line width for smoothing (default = 1.2)}
+
+\item{xlab}{x-axis label (default depends on predictor index)}
+
+\item{ylab}{y-axis label (default = "Y" for continuous)}
 }
 \value{
 A scatter plot with sufficient predictors.
 }
 \description{
-Scatter plot with sufficient predictors from npsdr() function
+Creates diagnostic scatter plots of nonlinear sufficient predictors produced
+by npsdr(). The function visualizes the estimated transformed directions
+and optionally overlays a lowess smoothing curve for continuous responses.
+
+Additional graphical arguments can be provided. These plots help assess
+nonlinear structure in the data and evaluate how effectively the kernel SDR
+method reduces dimensionality.
 }
 \examples{
 \donttest{
@@ -29,12 +58,12 @@ p <- 5;
 x <- matrix(rnorm(n*p, 0, 2), n, p)
 y <-  x[,1]/(0.5 + (x[,2] + 1)^2) + 0.2*rnorm(n)
 obj_kernel <- npsdr(x, y, plot=FALSE)
-plot(obj_kernel)
+plot(obj_kernel, d = 1)
 }
 }
 \seealso{
 \code{\link{npsdr_x}}, \code{\link{npsdr}}
 }
 \author{
-Jungmin Shin, \email{jungminshin@korea.ac.kr}, Seung Jun Shin, \email{sjshin@korea.ac.kr}, Andreas Artemiou \email{artemiou@uol.ac.cy}
+Jungmin Shin, \email{c16267@gmail.com}, Seung Jun Shin, \email{sjshin@korea.ac.kr}, Andreas Artemiou \email{artemiou@uol.ac.cy}
 }

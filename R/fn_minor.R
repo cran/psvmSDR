@@ -18,9 +18,80 @@ fn_arbitrary <- function(loss){
 
 mylogistic <- function(u) log(1+exp(-u))
 
+#' @noRd
+# --------------------------
+# Input validation utilities
+# --------------------------
+.check_input <- function(x, y) {
+  if (!is.matrix(x) && !is.data.frame(x))
+    stop("x must be a numeric matrix or data.frame.")
+  if (length(y) != nrow(x))
+    stop("length(y) must match nrow(x).")
+  invisible(TRUE)
+}
+
+# --------------------------
+# Response-type detection
+# --------------------------
+#' @noRd
+.response_type <- function(y) {
+  y0 <- stats::na.omit(y)
+  if (is.factor(y0) || is.ordered(y0)) {
+    lev <- levels(y0)
+    lev_num <- suppressWarnings(as.numeric(lev))
+    is_numeric_levels <- !any(is.na(lev_num))
+    if (is_numeric_levels) {
+      uniq <- unique(lev_num)
+      if (length(uniq) == 2L) return("binary")
+      if (length(uniq) <= 5L) return("ordinal")
+      return("categorical")
+    }
+    if (length(lev) == 2L) return("binary")
+    return(if (is.ordered(y0)) "ordinal" else "categorical")
+  }
+  if (is.character(y0)) {
+    u <- unique(trimws(tolower(y0)))
+    return(if (length(u) == 2L) "binary" else "categorical")
+  }
+  if (is.logical(y0)) return("binary")
+  if (is.numeric(y0) || is.integer(y0)) {
+    u <- sort(unique(y0))
+
+    if (length(u) == 2L) return("binary")
+    if (length(u) <= 5L && all(u == round(u))) return("ordinal")
+    return("continuous")
+  }
+  return("unknown")
+}
+
+
+# --------------------------
+# Safe linear solver (no explicit inverse)
+# --------------------------
+.safe_solve <- function(A, b, eps = 1e-6, max_tries = 5) {
+  p <- nrow(A)
+  for (i in 0:max_tries) {
+    eps_i <- eps * 10^i
+    A_eps <- A + diag(eps_i, p)
+    chol_try <- try(chol(A_eps), silent = TRUE)
+    if (!inherits(chol_try, "try-error")) {
+      return(backsolve(chol_try, forwardsolve(t(chol_try), b)))
+    }
+  }
+  return(qr.solve(A, b))
+}
 
 
 
+# Internal helper: preprocessing for real-time updates
+.rt_prepare <- function(x, Xbar = NULL) {
+  n <- nrow(x); p <- ncol(x)
+  if (is.null(Xbar)) Xbar <- colMeans(x)
+  x.centered <- sweep(x, 2, Xbar, FUN = "-")
+  x.star <- cbind(x.centered, -1)                 # (n x (p+1))
+  cov.x.star <- stats::cov(x.star)                # (p+1) x (p+1)
+  list(x.star = x.star, cov.x.star = cov.x.star, Xbar = Xbar)
+}
 
 ############################
 ### Derivative functions ###

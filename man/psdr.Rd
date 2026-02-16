@@ -18,38 +18,45 @@ psdr(
 )
 }
 \arguments{
-\item{x}{input matrix, of dimension \code{nobs} x \code{nvars}; each row is an observation vector. Requirement: \code{nvars}>1; in other words, \code{x} should have 2 or more columns.}
+\item{x}{input matrix, of dimension \code{nobs} x \code{nvars}; each row is an observation vector.}
 
-\item{y}{response variable, either can be continuous variable or (+1,-1) coded binary response vector.}
+\item{y}{response variable, either continuous or binary (any 2-level coding; e.g., -1/1, 0/1, 1/2, TRUE/FALSE, factor/character).}
 
 \item{loss}{pre-specified loss functions belongs to \code{"svm", "logit", "l2svm", "wsvm", "qr", "asls", "wlogit", "wl2svm", "lssvm", "wlssvm"}, and user-defined loss function object also can be used formed by inside double (or single) quotation mark. Default is 'svm'.}
 
-\item{h}{the number of slices and probabilities equally spaced in \eqn{(0,1)}. Default value is 10.}
+\item{h}{unified control for slicing or weighting; accepts either an integer or a numeric vector.}
 
-\item{lambda}{the cost parameter for the svm loss function. The default value is 1.}
+\item{lambda}{regularization parameter (default \code{1}).}
 
-\item{eps}{the threshold for stopping iteration with respect to the magnitude of the change of the derivative. The default value is 1.0e-5.}
+\item{eps}{convergence threshold on parameter change (default \code{1e-5}).}
 
-\item{max.iter}{maximum iteration number for the optimization process. default value is 100.}
+\item{max.iter}{maximum number of iterations (default \code{100}).}
 
-\item{eta}{learning rate for the gradient descent algorithm. The default value is 0.1.}
+\item{eta}{learning rate for gradient descent (default \code{0.1}).}
 
 \item{mtype}{a margin type, which is either margin ("m") or residual ("r") (See, Table 1 in the manuscript). Only need when user-defined loss is used. Default is "m".}
 
-\item{plot}{If \code{TRUE} then it produces scatter plots of \eqn{Y} versus \eqn{\hat{B^{\top}}_{j}\mathbf{X}}. \eqn{j} can be specified by the user with \eqn{j=1} as a default. The default is FALSE.}
+\item{plot}{logical; if TRUE, produces diagnostic plot.}
 }
 \value{
-An object with S3 class "psdr". Details are listed below.
-\item{\code{Mn}}{The estimated working matrix, which is obtained by the cumulative
-outer product of the estimated parameters over the slices. It will not print out, unless it is called manually.}
-\item{\code{evalues}}{Eigenvalues of the working matrix \eqn{Mn}}
-\item{\code{evectors}}{Eigenvectors of the \eqn{Mn}, the first leading \eqn{d} eigenvectors consists
-the basis of the central subspace}
+An object of S3 class \code{"psdr"} containing
+\itemize{
+\item \code{M}: working matrix
+\item \code{evalues}, \code{evectors}: eigen decomposition of \code{M}
+\item \code{fit}: metadata (n, p, ytype, hyperparameters, per-slice iteration/convergence info)
+}
 }
 \description{
-A function for a linear principal sufficient dimension reduction.
-}
-\details{
+This function implements a unified framework for linear principal SDR methods.
+It provides a single interface that covers many existing principal-machine
+approaches, such as principal SVM, weighted SVM, logistic, quantile, and
+asymmetric least squares SDR. The method estimates the central subspace by
+constructing a working matrix M derived from user-specified loss functions,
+slicing or weighting schemes, and regularization.
+
+The function is designed for both continuous responses and binary
+classification (with any two-level coding). Users may choose among several
+built-in loss functions or supply a custom loss function.
 Two examples of the usage of user-defined losses are presented below (\code{u} represents a margin):
 
 \code{mylogit <- function(u, ...) log(1+exp(-u))},
@@ -59,8 +66,13 @@ Two examples of the usage of user-defined losses are presented below (\code{u} r
 Argument \code{u} is a function variable  (any character is possible) and the argument \code{mtype} for \code{psdr()} determines a type of a margin, either (\code{type="m"}) or (\code{type="r"}) method. \code{type="m"} is a default.
 Users have to change \code{type="r"}, when applying residual type loss.
 Any additional parameters of the loss can be specified via \code{...} argument.
+
+The output includes the estimated eigenvalues and eigenvectors of M,
+which form the basis of the estimated central subspace, as well as
+detailed metadata used to summarize model fitting and diagnostics.
 }
 \examples{
+\donttest{
 ## ----------------------------
 ## Linear PM
 ## ----------------------------
@@ -72,6 +84,12 @@ y.tilde <- sign(y)
 obj <- psdr(x, y)
 print(obj)
 plot(obj, d=2)
+
+## --------------------------
+## User defined cutoff points
+## --------------------------
+obj_cut <- psdr(x, y, h = c(0.1, 0.3, 0.5, 0.7))
+print(obj_cut)
 
 ## --------------------------------
 ## Linear PM (Binary classification)
@@ -85,35 +103,42 @@ plot(obj_wsvm)
 mylogistic <- function(u) log(1+exp(-u))
 psdr(x, y, loss="mylogistic")
 
+## ----------------------------
+## Real-data example: iris (binary subset)
+## ----------------------------
+iris_binary <- droplevels(subset(iris, Species \%in\% c("setosa", "versicolor")))
+psdr(x = iris_binary[, 1:4], y = iris_binary$Species, plot = TRUE)
+}
+
 }
 \references{
 Artemiou, A. and Dong, Y. (2016)
 \emph{Sufficient dimension reduction via principal lq support vector machine,
- Electronic Journal of Statistics 10: 783–805}.\cr
- Artemiou, A., Dong, Y. and Shin, S. J. (2021)
+Electronic Journal of Statistics 10: 783–805}.\cr
+Artemiou, A., Dong, Y. and Shin, S. J. (2021)
 \emph{Real-time sufficient dimension reduction through principal least
- squares support vector machines, Pattern Recognition 112: 107768}.\cr
- Kim, B. and Shin, S. J. (2019)
+squares support vector machines, Pattern Recognition 112: 107768}.\cr
+Kim, B. and Shin, S. J. (2019)
 \emph{Principal weighted logistic regression for sufficient dimension
 reduction in binary classification, Journal of the Korean Statistical Society 48(2): 194–206}.\cr
- Li, B., Artemiou, A. and Li, L. (2011)
+Li, B., Artemiou, A. and Li, L. (2011)
 \emph{Principal support vector machines for linear and
 nonlinear sufficient dimension reduction, Annals of Statistics 39(6): 3182–3210}.\cr
 Soale, A.-N. and Dong, Y. (2022)
 \emph{On sufficient dimension reduction via principal asymmetric
- least squares, Journal of Nonparametric Statistics 34(1): 77–94}.\cr
- Wang, C., Shin, S. J. and Wu, Y. (2018)
+least squares, Journal of Nonparametric Statistics 34(1): 77–94}.\cr
+Wang, C., Shin, S. J. and Wu, Y. (2018)
 \emph{Principal quantile regression for sufficient dimension
- reduction with heteroscedasticity, Electronic Journal of Statistics 12(2): 2114–2140}.\cr
- Shin, S. J., Wu, Y., Zhang, H. H. and Liu, Y. (2017)
+reduction with heteroscedasticity, Electronic Journal of Statistics 12(2): 2114–2140}.\cr
+Shin, S. J., Wu, Y., Zhang, H. H. and Liu, Y. (2017)
 \emph{Principal weighted support vector machines for sufficient dimension reduction in
- binary classification, Biometrika 104(1): 67–81}. \cr
- Li, L. (2007)
+binary classification, Biometrika 104(1): 67–81}. \cr
+Li, L. (2007)
 \emph{Sparse sufficient dimension reduction, Biometrika 94(3): 603–613}.
 }
 \seealso{
 \code{\link{psdr_bic}}, \code{\link{rtpsdr}}
 }
 \author{
-Jungmin Shin, \email{jungminshin@korea.ac.kr}, Seung Jun Shin, \email{sjshin@korea.ac.kr}, Andreas Artemiou \email{artemiou@uol.ac.cy}
+Jungmin Shin, \email{c16267@gmail.com}, Seung Jun Shin, \email{sjshin@korea.ac.kr}, Andreas Artemiou \email{artemiou@uol.ac.cy}
 }

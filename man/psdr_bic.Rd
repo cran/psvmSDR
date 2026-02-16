@@ -2,36 +2,97 @@
 % Please edit documentation in R/fn_psdr_bic.R
 \name{psdr_bic}
 \alias{psdr_bic}
-\title{Order estimation via BIC-type criterion}
+\title{Structural dimension selection for principal SDR}
 \usage{
-psdr_bic(obj, rho = 0.01, plot = TRUE, ...)
+psdr_bic(
+  obj,
+  rho_grid = seq(0.001, 0.05, length = 10),
+  cv_folds = 5,
+  plot = TRUE,
+  seed = 123,
+  ...
+)
 }
 \arguments{
-\item{obj}{The psdr object}
+\item{obj}{A fitted \code{psdr} object.}
 
-\item{rho}{Parameter for BIC criterion. Default is 0.01.}
+\item{rho_grid}{Numeric vector of candidate \eqn{\rho} values. Default \code{seq(0.001, 0.05, length=10)}.}
 
-\item{plot}{Boolean. If TRUE, the plot of BIC values are depicted.}
+\item{cv_folds}{Number of cross-validation folds for stability evaluation. Default is 5.}
 
-\item{...}{Additional arguments to be passed to generic \code{plot} function.}
+\item{plot}{Logical; if TRUE, plots the BIC-type criterion curve and CV stability.}
+
+\item{seed}{Random seed for reproducibility.}
+
+\item{...}{Additional graphical arguments for plot.}
 }
 \value{
-Estimated BIC scores for determining the optimal structural dimension will be returned with plot.
+A list of class \code{"psdr_bic"} containing:
+\itemize{
+\item \code{rho_star} - selected rho minimizing cross-validated variation
+\item \code{d_hat} - estimated structural dimension
+\item \code{G_values} - matrix of BIC-type scores for each rho
+\item \code{cv_variation} - variation (variance) of d_hat across folds
+\item \code{fold_dhat} - per-fold estimated dimensions
+}
 }
 \description{
-Estimation of a structural dimensionality. Choose the k which maximizes a BIC (Bayesian information criterion) value.
+This function selects the structural dimension d of a fitted psdr model
+using the BIC-type criterion proposed by Li, Artemiou and Li (2011).
+The criterion evaluates cumulative eigenvalues of the working matrix,
+applying a penalty that depends on the tuning parameter rho and the sample size.
+
+Selects the structural dimension \eqn{d} of a principal SDR model using
+the BIC-type criterion of Li et al. (2011):
+
+\deqn{
+  G(d) = \sum_{j=1}^{d} v_j \;-\;
+  \rho \frac{d \log n}{\sqrt{n}} \, v_1 ,
+}
+
+where \eqn{v_j} are the eigenvalues of the working matrix M.
+
+To improve robustness, cross-validation is used to choose \eqn{\rho}
+based on the stability of the selected structural dimension across folds.
+Specifically, for each candidate \eqn{\rho}, the data are split into
+\eqn{K} folds, and a dimension estimate
+\eqn{\hat{d}^{(k)}(\rho)} is obtained from fold \eqn{k}.
+
+The CV stability metric is defined as
+
+\deqn{
+  \mathrm{Var}_{CV}(\rho)
+  = \frac{1}{K} \sum_{k=1}^{K}
+    \left\{ \hat{d}^{(k)}(\rho)
+    - \overline{d}(\rho) \right\}^{2},
+}
+
+where
+
+\deqn{
+  \overline{d}(\rho) = \frac{1}{K} \sum_{k=1}^{K}
+  \hat{d}^{(k)}(\rho).
+}
+
+The value of \eqn{\rho} that minimizes
+\eqn{\mathrm{Var}_{CV}(\rho)} is selected, yielding a dimension estimate that
+is both theoretically justified (via the BIC-type criterion) and empirically
+stable (via cross-validation).
+
+The function returns the selected \eqn{\rho}, the corresponding estimated
+dimension \eqn{d}, the matrix of BIC-type criterion values, and the CV-based
+stability metrics.
 }
 \examples{
 \donttest{
-set.seed(1234)
-n <- 200; p <- 10;
-x <- matrix(rnorm(n*p, 0, 1), n, p)
-y <-  x[,1]/(0.5 + (x[,2] + 1)^2) + rnorm(n, 0, .2)
-obj <- psdr(x, y, loss="svm")
-d.hat <- psdr_bic(obj)
-print(d.hat)
+set.seed(1)
+n <- 200; p <- 5;
+x <- matrix(rnorm(n*p), n, p)
+y <- x[,1]/(0.5+(x[,2]+1)^2)+0.2*rnorm(n)
+fit <- psdr(x, y, loss="svm")
+bic_out <- psdr_bic(fit, rho_grid=seq(0.05, 0.1, length=5), cv_folds=5)
+bic_out$d_hat
 }
-
 }
 \references{
 Li, B., Artemiou, A. and Li, L. (2011)
@@ -42,5 +103,5 @@ nonlinear sufficient dimension reduction, Annals of Statistics 39(6): 3182–321
 \code{\link{psdr}}
 }
 \author{
-Jungmin Shin, \email{jungminshin@korea.ac.kr}, Seung Jun Shin, \email{sjshin@korea.ac.kr}, Andreas Artemiou \email{artemiou@uol.ac.cy}
+Jungmin Shin, \email{c16267@gmail.com}, Seung Jun Shin, \email{sjshin@korea.ac.kr}, Andreas Artemiou \email{artemiou@uol.ac.cy}
 }
